@@ -1,0 +1,71 @@
+Write a PL/SQL block of code using parameterized Cursor that will merge the data available in the newly created table N_Roll Call with the data available in the table O_RollCall. If the data in the first table already exist in the second table then that data should be skipped.
+
+Note: Instructor will frame the problem statement for writing PL/SQL block using all types of Cursors in line with above statement.
+
+Tables Creation:
+CREATE TABLE O_RollCall (
+    roll_no NUMBER PRIMARY KEY,
+    name VARCHAR(20)
+);
+
+CREATE TABLE N_RollCall (
+    roll_no NUMBER,
+    name VARCHAR(20)
+);
+
+Adding Values:
+INSERT INTO O_RollCall (roll_no, name) VALUES (1, 'Disha');
+INSERT INTO O_RollCall (roll_no, name) VALUES (2, 'Sara');
+INSERT INTO O_RollCall (roll_no, name) VALUES (3, 'Apoorva');
+
+INSERT INTO N_RollCall (roll_no, name) VALUES (2, 'Sara');    
+INSERT INTO N_RollCall (roll_no, name) VALUES (3, 'Apoorva');  
+INSERT INTO N_RollCall (roll_no, name) VALUES (4, 'Prithvi');     
+INSERT INTO N_RollCall (roll_no, name) VALUES (5, 'Aditya');    
+
+Main:
+DECLARE
+    CURSOR n_cursor (p_roll_no NUMBER) IS
+        SELECT roll_no, name FROM N_RollCall WHERE roll_no = p_roll_no;
+
+    v_roll_no NUMBER;
+    v_name VARCHAR(20);
+BEGIN
+    FOR rec IN (SELECT roll_no, name FROM N_RollCall) LOOP
+        OPEN n_cursor(rec.roll_no);
+        
+        LOOP
+            FETCH n_cursor INTO v_roll_no, v_name;
+            EXIT WHEN n_cursor%NOTFOUND;
+
+            BEGIN
+                INSERT INTO O_RollCall (roll_no, name)
+                VALUES (v_roll_no, v_name);
+            EXCEPTION
+                WHEN DUP_VAL_ON_INDEX THEN
+                    NULL;  
+            END;
+        END LOOP;
+
+        CLOSE n_cursor;
+    END LOOP;
+END;
+/
+
+
+
+
+
+
+
+
+SELECT * FROM O_RollCall;
+-------------------------
+ROLL_NO	    NAME
+-------------------------
+1	        Disha
+2	        Sara
+3	        Apoorva
+4	        Prithvi
+5	        Aditya
+-------------------------

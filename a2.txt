@@ -1,0 +1,413 @@
+mysql> select * from Account;
++--------+------------------+---------+
+| acc_no | branch_name      | balance |
++--------+------------------+---------+
+|    101 | Kharadi          |   50000 |
+|    102 | Kharadi          |   75000 |
+|    103 | Bund Garden      |    5000 |
+|    104 | SHivaji-Nagar    |  100000 |
+|    105 | SHivaji-Nagar    |   40000 |
+|    106 | Akurdi           |   40000 |
+|    107 | Akurdi           |   55000 |
+|    108 | Dadar            |   25000 |
++--------+------------------+---------+
+8 rows in set (0.01 sec)
+
+mysql> select * from Borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| Sharvari  |       1 |
+| Apoorva   |       2 |
+| Omm       |       3 |
+| Atharva   |       4 |
+| Aditya    |       5 |
+| Devraj    |       6 |
+| Tulaja    |       7 |
+| Devraj    |       8 |
+| Sara      |       9 |
++-----------+---------+
+9 rows in set (0.00 sec)
+
+mysql> select * from Branch;
++---------------+-------------+----------+
+| branch_name   | branch_city | assets   |
++---------------+-------------+----------+
+| Akurdi        | PCMC        |  1000000 |
+| Bandra        | Mumbai      |  5500000 |
+| Bund Garden   | Pune        | 10000000 |
+| Dadar         | Mumbai      |  7500000 |
+| Kharadi       | Pune        | 50000000 |
+| Kothrud       | Pune        |  1000000 |
+| SHivaji-Nagar | Pune        | 25000000 |
++---------------+-------------+----------+
+7 rows in set (0.03 sec)
+
+mysql> select * from Customer;
++-----------+---------------+-----------+
+| cust_name | cust_street   | cust_city |
++-----------+---------------+-----------+
+| Aditya    | Bund Garden   | Pune      |
+| Apoorva   | Bund Garden   | Pune      |
+| Atharva   | Akurdi        | PCMC      |
+| Devraj    | Dadar         | Mumbai    |
+| Disha     | Kharadi       | Pune      |
+| Omm       | Akurdi        | PCMC      |
+| Prithvi   | SHivaji-Nagar | Pune      |
+| Sara      | Kothrud       | Pune      |
+| Sharvari  | Kharadi       | Pune      |
+| Tulaja    | Akurdi        | PCMC      |
+| Yatiksha  | Dadar         | Mumbai    |
++-----------+---------------+-----------+
+11 rows in set (0.00 sec)
+
+mysql> select * from Depositor;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Disha     |    101 |
+| Sharvari  |    102 |
+| Aditya    |    103 |
+| Prithvi   |    105 |
+| Omm       |    106 |
+| Atharva   |    107 |
++-----------+--------+
+6 rows in set (0.04 sec)
+
+mysql> select * from Loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|       1 | Kharadi     |  20000 |
+|       2 | Kharadi     |  15000 |
+|       3 | Akurdi      |  25000 |
+|       4 | Akurdi      |  50000 |
+|       5 | Akurdi      |   7000 |
+|       6 | Dadar       |  55000 |
+|       7 | Akurdi      |  12500 |
+|       8 | Dadar       |  65000 |
+|       9 | Kothrud     | 105000 |
++---------+-------------+--------+
+9 rows in set (0.00 sec)
+
+
+1. Find the names of all branches in loan relation.
+
+mysql> select DISTINCT branch_name from Loan;
++-------------+
+| branch_name |
++-------------+
+| Akurdi      |
+| Dadar       |
+| Kharadi     |
+| Kothrud     |
++-------------+
+4 rows in set (0.00 sec)
+
+
+2. Find all loan numbers for loans made at Akurdi Branch with loan amount > 12000.
+
+mysql> select loan_no from Loan where branch_name="Akurdi" and amount>12000;
++---------+
+| loan_no |
++---------+
+|       3 |
+|       4 |
+|       7 |
++---------+
+3 rows in set (0.01 sec)
+
+
+3. Find all customers who have a loan from bank. Find their names, loan_no and loan amount.
+
+mysql> select cust_name, loan_no, (select amount from Loan where Loan.loan_no = Borrower.loan_no) AS amount from Borrower;
++-----------+---------+--------+
+| cust_name | loan_no | amount |
++-----------+---------+--------+
+| Sharvari  |       1 |  20000 |
+| Apoorva   |       2 |  15000 |
+| Omm       |       3 |  25000 |
+| Atharva   |       4 |  50000 |
+| Aditya    |       5 |   7000 |
+| Devraj    |       6 |  55000 |
+| Tulaja    |       7 |  12500 |
+| Devraj    |       8 |  65000 |
+| Sara      |       9 | 105000 |
++-----------+---------+--------+
+9 rows in set (0.00 sec)
+
+
+4. List all customers in alphabetical order who have loan from Akurdi branch.
+
+mysql> select cust_name from Borrower where loan_no IN (select loan_no from Loan where branch_name="Akurdi") ORDER BY cust_name;
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Atharva   |
+| Omm       |
+| Tulaja    |
++-----------+
+4 rows in set (0.00 sec)
+
+
+5.Find all customers who have an account or loan or both at bank.
+
+mysql> select cust_name from Customer UNION select cust_name from Borrower;
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Apoorva   |
+| Atharva   |
+| Devraj    |
+| Disha     |
+| Omm       |
+| Prithvi   |
+| Sara      |
+| Sharvari  |
+| Tulaja    |
+| Yatiksha  |
++-----------+
+11 rows in set (0.01 sec)
+
+
+6. Find all customers who have both account and loan at bank.
+
+mysql> select cust_name from Customer where cust_name IN (select cust_name from Borrower);
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Apoorva   |
+| Atharva   |
+| Devraj    |
+| Omm       |
+| Sara      |
+| Sharvari  |
+| Tulaja    |
++-----------+
+8 rows in set (0.00 sec)
+
+
+7. Find all customers who have account but no loan at the bank.
+
+mysql> select cust_name from Customer where cust_name NOT IN (select cust_name from Borrower);
++-----------+
+| cust_name |
++-----------+
+| Disha     |
+| Prithvi   |
+| Yatiksha  |
++-----------+
+3 rows in set (0.00 sec)
+
+
+8.Find the average account balance at each branch.
+
+mysql> select branch_name, AVG(balance) from Account GROUP BY branch_name;
++---------------+--------------+
+| branch_name   | AVG(balance) |
++---------------+--------------+
+| Akurdi        |   47500.0000 |
+| Bund Garden   |    5000.0000 |
+| Dadar         |   25000.0000 |
+| Kharadi       |   62500.0000 |
+| SHivaji-Nagar |   70000.0000 |
++---------------+--------------+
+5 rows in set (0.00 sec)
+
+
+9. Find no. of depositors at each branch.
+
+mysql> select branch_name, COUNT(*) from Account
+    -> where Acc_no IN (select acc_no from Depositor)
+    -> GROUP BY branch_name;
++---------------+----------+
+| branch_name   | COUNT(*) |
++---------------+----------+
+| Akurdi        |        2 |
+| Bund Garden   |        1 |
+| Kharadi       |        2 |
+| SHivaji-Nagar |        1 |
++---------------+----------+
+4 rows in set (0.00 sec)
+
+
+10. Find name of Customer and city where customer name starts with Letter P.
+
+mysql> select cust_name, cust_city from Customer where cust_name LIKE 'P%';
++-----------+-----------+
+| cust_name | cust_city |
++-----------+-----------+
+| Prithvi   | Pune      |
++-----------+-----------+
+1 row in set (0.00 sec)
+ 
+
+11. Display distinct cities of branch.
+
+mysql> select DISTINCT branch_city from Branch;
++-------------+
+| branch_city |
++-------------+
+| PCMC        |
+| Mumbai      |
+| Pune        |
++-------------+
+3 rows in set (0.00 sec)
+
+
+12. Find the branches where average account balance > 12000
+
+mysql> select branch_name from Account 
+    -> GROUP BY branch_name HAVING AVG(balance)>12000;
++---------------+
+| branch_name   |
++---------------+
+| Akurdi        |
+| Dadar         |
+| Kharadi       |
+| SHivaji-Nagar |
++---------------+
+4 rows in set (0.00 sec)
+
+13. Find number of tuples in customer relation.
+
+ 
+mysql> select COUNT(*) AS tuple_cnt from Customer;
++-----------+
+| tuple_cnt |
++-----------+
+|        11 |
++-----------+
+1 row in set (0.00 sec)
+
+
+14.Calculate total loan amount given by bank.
+
+mysql> select SUM(amount) AS LOAN_TOTAL from Loan;
++------------+
+| LOAN_TOTAL |
++------------+
+|     354500 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select SUM(amount) AS LOAN_TOTAL from Loan GROUP BY branch_name;
++------------+
+| LOAN_TOTAL |
++------------+
+|      94500 |
+|     120000 |
+|      35000 |
+|     105000 |
++------------+
+4 rows in set (0.00 sec)
+
+15. Delete all loans with loan amount between 12000 and 15000.
+
+mysql> DELETE FROM Borrower WHERE loan_no IN 
+    -> (select loan_no from Loan WHERE amount BETWEEN 12000 AND 15000);
+Query OK, 2 rows affected (0.05 sec)
+
+mysql> DELETE FROM Loan WHERE amount BETWEEN 12000 AND 15000;
+Query OK, 2 rows affected (0.03 sec)
+
+mysql> select * FROM Loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|       1 | Kharadi     |  20000 |
+|       3 | Akurdi      |  25000 |
+|       4 | Akurdi      |  50000 |
+|       5 | Akurdi      |   7000 |
+|       6 | Dadar       |  55000 |
+|       8 | Dadar       |  65000 |
+|       9 | Kothrud     | 105000 |
++---------+-------------+--------+
+7 rows in set (0.00 sec)
+
+16. Delete all tuples at every branch located at Mumbai.
+
+mysql> select branch_name from Branch WHERE branch_city='Mumbai';
++-------------+
+| branch_name |
++-------------+
+| Bandra      |
+| Dadar       |
++-------------+
+2 rows in set (0.00 sec)
+
+mysql> DELETE FROM Depositor WHERE acc_no 
+    -> IN (select acc_no from Account WHERE branch_name IN
+    -> (select branch_name from Branch WHERE branch_city='Mumbai'));
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> DELETE FROM Account WHERE branch_name IN
+    -> (select branch_name from Branch WHERE branch_city='Mumbai');
+Query OK, 1 row affected (0.04 sec)
+
+mysql> DELETE FROM Borrower WHERE loan_no IN
+    -> (SELECT loan_no FROM Loan WHERE branch_name IN
+    -> (select branch_name from Branch WHERE branch_city='Mumbai'));            
+Query OK, 2 rows affected (0.04 sec)
+
+mysql> DELETE FROM Loan WHERE branch_name IN 
+    -> (select branch_name from Branch WHERE branch_city='Mumbai');
+Query OK, 2 rows affected (0.03 sec)
+
+mysql> DELETE FROM Branch WHERE branch_city='Mumbai';
+Query OK, 2 rows affected (0.03 sec)
+
+mysql> select * from Branch;
++---------------+-------------+----------+
+| branch_name   | branch_city | assets   |
++---------------+-------------+----------+
+| Akurdi        | PCMC        |  1000000 |
+| Bund Garden   | Pune        | 10000000 |
+| Kharadi       | Pune        | 50000000 |
+| Kothrud       | Pune        |  1000000 |
+| SHivaji-Nagar | Pune        | 25000000 |
++---------------+-------------+----------+
+5 rows in set (0.00 sec)
+
+mysql> select * from Account;
++--------+---------------+---------+
+| acc_no | branch_name   | balance |
++--------+---------------+---------+
+|    101 | Kharadi       |   50000 |
+|    102 | Kharadi       |   75000 |
+|    103 | Bund Garden   |    5000 |
+|    104 | SHivaji-Nagar |  100000 |
+|    105 | SHivaji-Nagar |   40000 |
+|    106 | Akurdi        |   40000 |
+|    107 | Akurdi        |   55000 |
++--------+---------------+---------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| Sharvari  |       1 |
+| Omm       |       3 |
+| Atharva   |       4 |
+| Aditya    |       5 |
+| Sara      |       9 |
++-----------+---------+
+5 rows in set (0.00 sec)
+
+mysql> select * from Loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|       1 | Kharadi     |  20000 |
+|       3 | Akurdi      |  25000 |
+|       4 | Akurdi      |  50000 |
+|       5 | Akurdi      |   7000 |
+|       9 | Kothrud     | 105000 |
++---------+-------------+--------+
+5 rows in set (0.00 sec)
+
+

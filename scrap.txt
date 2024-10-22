@@ -1,0 +1,599 @@
+
+mysql> use bank;
+ERROR 1049 (42000): Unknown database 'bank'
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.01 sec)
+
+mysql> create database bank;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> CREATE TABLE Account(acc_no INT, branch_name VARCHAR(50), balance INT, PRIMARY KEY (acc_no));
+ERROR 1046 (3D000): No database selected
+mysql> use bank;
+Database changed
+mysql> CREATE TABLE Account(acc_no INT, branch_name VARCHAR(50), balance INT, PRIMARY KEY (acc_no));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE Branch(branch_name VARCHAR(50), branch_city VARCHAR(50), assets INT, PRIMARY KEY (branch_name));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Customer (cust_name VARCHAR(50), cust_street VARCHAR(50), cust_city VARCHAR(50), PRIMARY KEY (cust_name));
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE Depositor (cust_name VARCHAR(50), acc_no INT);
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Loan (loan_no INT, branch_name VARCHAR(50), amount INT, PRIMARY KEY (loan_no));
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Borrower (cust_name VARCHAR(50), loan_no INT);
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> ALTER TABLE Account ADD FOREIGN KEY (branch_name) REFERENCES Branch(branch_name);;
+Query OK, 0 rows affected (0.09 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+ERROR:
+No query specified
+
+mysql> ALTER TABLE Account ADD FOREIGN KEY (branch_name) REFERENCES Branch(branch_name);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Depositor ADD FOREIGN KEY (cust_name) REFERENCES Customer (cust_name);
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Depositor ADD FOREIGN KEY (acc_no) REFERENCES Account (acc_no);
+Query OK, 0 rows affected (0.08 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Loan ADD FOREIGN KEY (branch_name) REFERENCES Branch (branch_name);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Borrower ADD FOREIGN KEY (cust_name) REFERENCES Customer (cust_name);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Borrower ADD FOREIGN KEY (loan_no) REFERENCES Loan (loan_no);
+Query OK, 0 rows affected (0.07 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Branch (branch_name, branch_city, assets) VALUES
+    -> ("Pune_Station", "Pune", 5000000), ("Kharadi", "Pune", 2000000), ("Kothrud", "Pune", 500000000)("Akurdi", "PCMC", 32000000), ("Nigdi", "PCMC", 5500000),("Dadar", "Mumbai", 6000000),;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '("Akurdi", "PCMC", 32000000), ("Nigdi", "PCMC", 5500000),("Dadar", "Mumbai", 600' at line 2
+mysql> ("Pune_Station", "Pune", 5000000), ("Kharadi", "Pune", 2000000), ("Kothrud", "Pune", 500000000)
+,("Akurdi", "PCMC", 32000000), ("Nigdi", "PCMC", 5500000),("Dadar", "Mumbai", 6000000),;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"Pune_Station", "Pune", 5000000), ("Kharadi", "Pune", 2000000), ("Kothrud", "Pun' at line 1
+mysql> INSERT INTO branch (branch_name, branch_city, assets)
+    -> VALUES
+    -> ("Pune_Station", "Pune", 5000000),
+    -> ("Kharadi", "Pune", 2000000),
+    -> ("Kothrud", "Pune", 500000000),
+    -> ("Akurdi", "PCMC", 32000000),
+    -> ("Nigdi", "PCMC", 5500000),
+    -> ("Dadar", "Mumbai", 6000000);
+Query OK, 6 rows affected (0.01 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Customer (cust_name, cust_street, cust_city) VALUES
+    -> ("Aditya", "Bund Garden", "Pune"),
+    -> ("Apoorva", "Bund Garden", "Pune"),
+    -> ("Atharva", "Akurdi", "PCMC"),
+    -> ("Devraj", "Dadar", "Mumbai"),
+    -> ("Disha", "Kharadi", "Pune"),
+    -> ("Omm", "Akurdi", "PCMC"),
+    -> ("Prithvi", "Shivaji-Nagar", "Pune"),
+    -> ("Sara", "Kothrud", "Pune"),
+    -> ("Sharvari", "Kharadi", "Pune"),
+    -> ("Tulaja", "Akurdi", "PCMC"),
+    -> ("Yatiksha", "Dadar", "Mumbai");
+Query OK, 11 rows affected (0.01 sec)
+Records: 11  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Bund Garden", 5000),
+    -> (104, "Shivaji-Nagar", 100000),
+    -> (105, "Shivaji-Nagar", 40000),
+    -> (106, "Akurdi", 40000),
+    -> (107, "Akurdi", 55000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`account`, CONSTRAINT `account_ibfk_1` FOREIGN KEY (`branch_name`) REFERENCES `branch` (`branch_name`))
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Bund Garden", 5000),
+    -> (104, "Shivaji-Nagar", 100000),
+    -> (105, "Shivaji-Nagar", 40000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`account`, CONSTRAINT `account_ibfk_1` FOREIGN KEY (`branch_name`) REFERENCES `branch` (`branch_name`))
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Nigdi", 5000),
+    -> (104, "Shivaji-Nagar", 100000),
+    -> (105, "Shivaji-Nagar", 40000);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`account`, CONSTRAINT `account_ibfk_1` FOREIGN KEY (`branch_name`) REFERENCES `branch` (`branch_name`))
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Bund Garden", 5000),
+    ->
+    -> '
+    '> h
+    '> //
+    '> ;
+    '> ;;
+    '> ^Z;
+Bye
+
+C:\Users\gores>mysql -u root -p
+Enter password: ********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 17
+Server version: 8.0.39 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> use bank;
+Database changed
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Nigdi", 5000),
+    -> (104, "Shivaji-Nagar", 100000),
+    -> ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 5
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES
+    -> (101, "Kharadi", 50000),
+    -> (102, "Kharadi", 75000),
+    -> (103, "Nigdi", 5000),
+    -> (104, "Kothrud", 100000),
+    -> (105, "Kothrud", 80000);
+Query OK, 5 rows affected (0.01 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Loan (loan_no, branch_name, amount) VALUES
+    -> (1, "Kharadi", 20000),
+    -> (2, "Kharadi", 15000),
+    -> (3, "Akurdi", 25000),
+    -> (4, "Akurdi", 50000),
+    -> (5, "Akurdi", 7000),
+    -> (6, "Dadar", 55000),
+    -> (7, "Akurdi", 12500),
+    -> (8, "Dadar", 65000),
+    -> (9, "Kothrud", 105000);
+Query OK, 9 rows affected (0.01 sec)
+Records: 9  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Borrower (cust_name, loan_no) VALUES
+    -> ("Sharvari", 1),
+    -> ("Apoorva", 2),
+    -> ("Omm", 3),
+    -> ("Atharva", 4),
+    -> ("Aditya", 5),
+    -> ("Devraj", 6),
+    -> ("Tulaja", 7),
+    -> ("Devraj", 8),
+    -> ("Sara", 9);
+Query OK, 9 rows affected (0.00 sec)
+Records: 9  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Depositor (cust_name, acc_no) VALUES
+    -> ("Disha", 101),
+    -> ("Sharvari", 102),
+    -> ("Aditya", 103),
+    -> ("Prithvi", 105),
+    -> ("Omm", 106),
+    -> ("Atharva", 107);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`depositor`, CONSTRAINT `depositor_ibfk_2` FOREIGN KEY (`acc_no`) REFERENCES `account` (`acc_no`))
+mysql> INSERT INTO Depositor (cust_name, acc_no) VALUES
+    -> ("Disha", 101),
+    -> ("Sharvari", 102),
+    -> ("Aditya", 103),
+    -> ("Prithvi", 104);
+Query OK, 4 rows affected (0.00 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Customer (cust_name, cust_street, cust_city) VALUES
+    -> ('Aditya', 'Pune Station', 'Pune'),
+    -> ('Apoorva', 'Pune Station', 'Pune'),
+    -> ('Atharva', 'Akurdi', 'PCMC'),
+    -> ('Devraj', 'Dadar', 'Mumbai'),
+    -> ('Disha', 'Kharadi', 'Pune'),
+    -> ('Omm', 'Akurdi', 'PCMC'),
+    -> ('Prithvi', 'Kothrud', 'Pune'),
+    -> ('Sara', 'Kothrud', 'Pune'),
+    -> ('Sharvari', 'Kharadi', 'Pune'),
+    -> ('Tulaja', 'Akurdi', 'PCMC'),
+    -> ('Yatiksha', 'Dadar', 'Mumbai');
+ERROR 1062 (23000): Duplicate entry 'Aditya' for key 'customer.PRIMARY'
+mysql> INSERT INTO Customer (cust_name, cust_street, cust_city) VALUES
+    -> ('Adi', 'Pune Station', 'Pune'),
+    -> ('Apoorva', 'Pune Station', 'Pune'),
+    -> ('Atharva', 'Akurdi', 'PCMC'),
+    -> ('Devraj', 'Dadar', 'Mumbai'),
+    -> ('Disha', 'Kharadi', 'Pune'),
+    -> ('Omm', 'Akurdi', 'PCMC'),
+    -> ('Prithvi', 'Kothrud', 'Pune'),
+    -> ('Sara', 'Kothrud', 'Pune'),
+    -> ('Sharvari', 'Kharadi', 'Pune'),
+    -> ('Tulaja', 'Akurdi', 'PCMC'),
+    -> ('Yatiksha', 'Dadar', 'Mumbai');
+ERROR 1062 (23000): Duplicate entry 'Apoorva' for key 'customer.PRIMARY'
+mysql> select * from Customers;
+ERROR 1146 (42S02): Table 'bank.customers' doesn't exist
+mysql> show tables;
++----------------+
+| Tables_in_bank |
++----------------+
+| account        |
+| borrower       |
+| branch         |
+| customer       |
+| depositor      |
+| loan           |
++----------------+
+6 rows in set (0.01 sec)
+
+mysql> select * from account;
++--------+-------------+---------+
+| acc_no | branch_name | balance |
++--------+-------------+---------+
+|    101 | Kharadi     |   50000 |
+|    102 | Kharadi     |   75000 |
+|    103 | Nigdi       |    5000 |
+|    104 | Kothrud     |  100000 |
+|    105 | Kothrud     |   80000 |
++--------+-------------+---------+
+5 rows in set (0.00 sec)
+
+mysql> select * from borrower;
++-----------+---------+
+| cust_name | loan_no |
++-----------+---------+
+| Sharvari  |       1 |
+| Apoorva   |       2 |
+| Omm       |       3 |
+| Atharva   |       4 |
+| Aditya    |       5 |
+| Devraj    |       6 |
+| Tulaja    |       7 |
+| Devraj    |       8 |
+| Sara      |       9 |
++-----------+---------+
+9 rows in set (0.00 sec)
+
+mysql> select * from branch;
++--------------+-------------+-----------+
+| branch_name  | branch_city | assets    |
++--------------+-------------+-----------+
+| Akurdi       | PCMC        |  32000000 |
+| Dadar        | Mumbai      |   6000000 |
+| Kharadi      | Pune        |   2000000 |
+| Kothrud      | Pune        | 500000000 |
+| Nigdi        | PCMC        |   5500000 |
+| Pune_Station | Pune        |   5000000 |
++--------------+-------------+-----------+
+6 rows in set (0.00 sec)
+
+mysql> select * from customer;
++-----------+---------------+-----------+
+| cust_name | cust_street   | cust_city |
++-----------+---------------+-----------+
+| Aditya    | Bund Garden   | Pune      |
+| Apoorva   | Bund Garden   | Pune      |
+| Atharva   | Akurdi        | PCMC      |
+| Devraj    | Dadar         | Mumbai    |
+| Disha     | Kharadi       | Pune      |
+| Omm       | Akurdi        | PCMC      |
+| Prithvi   | Shivaji-Nagar | Pune      |
+| Sara      | Kothrud       | Pune      |
+| Sharvari  | Kharadi       | Pune      |
+| Tulaja    | Akurdi        | PCMC      |
+| Yatiksha  | Dadar         | Mumbai    |
++-----------+---------------+-----------+
+11 rows in set (0.00 sec)
+
+mysql> select * from depositor;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Disha     |    101 |
+| Sharvari  |    102 |
+| Aditya    |    103 |
+| Prithvi   |    104 |
++-----------+--------+
+4 rows in set (0.00 sec)
+
+mysql> select * from loan;
++---------+-------------+--------+
+| loan_no | branch_name | amount |
++---------+-------------+--------+
+|       1 | Kharadi     |  20000 |
+|       2 | Kharadi     |  15000 |
+|       3 | Akurdi      |  25000 |
+|       4 | Akurdi      |  50000 |
+|       5 | Akurdi      |   7000 |
+|       6 | Dadar       |  55000 |
+|       7 | Akurdi      |  12500 |
+|       8 | Dadar       |  65000 |
+|       9 | Kothrud     | 105000 |
++---------+-------------+--------+
+9 rows in set (0.00 sec)
+
+mysql> CREATE VIEW View1 AS
+    -> SELECT cust_name
+    -> FROM Borrower
+    -> INNER JOIN Loan ON Borrower.loan_no = Loan.loan_no
+    -> WHERE branch_name = "Akurdi"
+    -> ORDER BY cust_name;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM View1;
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Atharva   |
+| Omm       |
+| Tulaja    |
++-----------+
+4 rows in set (0.00 sec)
+
+mysql> CREATE VIEW View2 AS
+    ->  SELECT branch_name, branch_city
+    -> FROM Branch;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SELECT * FROM View2;
++--------------+-------------+
+| branch_name  | branch_city |
++--------------+-------------+
+| Akurdi       | PCMC        |
+| Dadar        | Mumbai      |
+| Kharadi      | Pune        |
+| Kothrud      | Pune        |
+| Nigdi        | PCMC        |
+| Pune_Station | Pune        |
++--------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> INSERT INTO View2 (branch_name, branch_city) VALUES ('Bandra', 'Mumbai');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM View2;
++--------------+-------------+
+| branch_name  | branch_city |
++--------------+-------------+
+| Akurdi       | PCMC        |
+| Bandra       | Mumbai      |
+| Dadar        | Mumbai      |
+| Kharadi      | Pune        |
+| Kothrud      | Pune        |
+| Nigdi        | PCMC        |
+| Pune_Station | Pune        |
++--------------+-------------+
+7 rows in set (0.00 sec)
+
+mysql> UPDATE View2 SET branch_name = 'Vikroli' WHERE branch_name = 'Mumbai';
+Query OK, 0 rows affected (0.00 sec)
+Rows matched: 0  Changed: 0  Warnings: 0
+
+mysql> UPDATE View2 SET branch_name = 'Vikroli' WHERE branch_name = 'Bandra';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM View2;
++--------------+-------------+
+| branch_name  | branch_city |
++--------------+-------------+
+| Akurdi       | PCMC        |
+| Dadar        | Mumbai      |
+| Kharadi      | Pune        |
+| Kothrud      | Pune        |
+| Nigdi        | PCMC        |
+| Pune_Station | Pune        |
+| Vikroli      | Mumbai      |
++--------------+-------------+
+7 rows in set (0.00 sec)
+
+mysql> DELETE FROM View2 WHERE branch_name = 'Vikroli';
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM View2;
++--------------+-------------+
+| branch_name  | branch_city |
++--------------+-------------+
+| Akurdi       | PCMC        |
+| Dadar        | Mumbai      |
+| Kharadi      | Pune        |
+| Kothrud      | Pune        |
+| Nigdi        | PCMC        |
+| Pune_Station | Pune        |
++--------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> CREATE VIEW View3 AS
+    -> SELECT Borrower.cust_name, Depositor.acc_no
+    -> FROM Borrower JOIN Depositor ON Borrower.cust_name = Depositor.cust_name;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SELECT * FROM View3;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Sharvari  |    102 |
+| Aditya    |    103 |
++-----------+--------+
+2 rows in set (0.00 sec)
+
+mysql> INSERT INTO Customer (cust_name, cust_street, cust_city) VALUES ("Macho", "Pedgaon", "Ahemadnagar");
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES (110, "Dadar", 3000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Loan (loan_no, branch_name, amount) VALUES (10, "Dadar", 500);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Borrower (cust_name, loan_no) VALUES ("Sakshi", 10);
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`borrower`, CONSTRAINT `borrower_ibfk_1` FOREIGN KEY (`cust_name`) REFERENCES `customer` (`cust_name`))
+mysql> INSERT INTO Borrower (cust_name, loan_no) VALUES ("Sara", 10);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Depositor(cust_name, Acc_no) VALUES("Sara", 110);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM View3;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Sharvari  |    102 |
+| Aditya    |    103 |
+| Sara      |    110 |
+| Sara      |    110 |
++-----------+--------+
+4 rows in set (0.00 sec)
+
+mysql> INSERT INTO Account (acc_no, branch_name, balance) VALUES (111, 'Kothrud', 3000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> UPDATE Depositor SET acc_no = 112 WHERE cust_name = 'Sara';
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`depositor`, CONSTRAINT `depositor_ibfk_2` FOREIGN KEY (`acc_no`) REFERENCES `account` (`acc_no`))
+mysql> UPDATE Depositor SET acc_no = 112 WHERE cust_name = 'Aditya';
+ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`bank`.`depositor`, CONSTRAINT `depositor_ibfk_2` FOREIGN KEY (`acc_no`) REFERENCES `account` (`acc_no`))
+mysql> UPDATE Depositor SET acc_no = 111 WHERE cust_name = 'Sara';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM View3;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Sharvari  |    102 |
+| Aditya    |    103 |
+| Sara      |    111 |
+| Sara      |    111 |
++-----------+--------+
+4 rows in set (0.00 sec)
+
+mysql> DELETE FROM Borrower WHERE cust_name = 'Sara';
+Query OK, 2 rows affected (0.00 sec)
+
+mysql> DELETE FROM Depositor WHERE cust_name = 'Sara';
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT * FROM View3;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Sharvari  |    102 |
+| Aditya    |    103 |
++-----------+--------+
+2 rows in set (0.00 sec)
+
+4.
+
+mysql> SELECT DISTINCT Customer.cust_name
+    -> FROM Customer
+    -> LEFT JOIN Depositor ON Customer.cust_name = Depositor.cust_name
+    -> LEFT JOIN Borrower ON Customer.cust_name = Borrower.cust_name
+    -> WHERE Depositor.acc_no IS NOT NULL OR Borrower.loan_no IS NOT NULL;
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Apoorva   |
+| Atharva   |
+| Devraj    |
+| Disha     |
+| Omm       |
+| Prithvi   |
+| Sharvari  |
+| Tulaja    |
++-----------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT * FROM View1;
++-----------+
+| cust_name |
++-----------+
+| Aditya    |
+| Atharva   |
+| Omm       |
+| Tulaja    |
++-----------+
+4 rows in set (0.00 sec)
+
+mysql> SELECT * FROM View2;
++--------------+-------------+
+| branch_name  | branch_city |
++--------------+-------------+
+| Akurdi       | PCMC        |
+| Dadar        | Mumbai      |
+| Kharadi      | Pune        |
+| Kothrud      | Pune        |
+| Nigdi        | PCMC        |
+| Pune_Station | Pune        |
++--------------+-------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT * FROM View3;
++-----------+--------+
+| cust_name | acc_no |
++-----------+--------+
+| Sharvari  |    102 |
+| Aditya    |    103 |
++-----------+--------+
+2 rows in set (0.00 sec)
+
+mysql> CREATE INDEX cust_ind ON Customer (cust_city);
+Query OK, 0 rows affected (0.05 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> CREATE UNIQUE INDEX branch_ind ON Branch (branch_name);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SHOW INDEX FROM customer;
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table    | Non_unique | Key_name | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| customer |          0 | PRIMARY  |            1 | cust_name   | A         |          11 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| customer |          1 | cust_ind |            1 | cust_city   | A         |           4 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
++----------+------------+----------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.01 sec)
+
+mysql> SHOW INDEX FROM branch;
++--------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table  | Non_unique | Key_name   | Seq_in_index | Column_name | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++--------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| branch |          0 | PRIMARY    |            1 | branch_name | A         |           6 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| branch |          0 | branch_ind |            1 | branch_name | A         |           6 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
++--------+------------+------------+--------------+-------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+2 rows in set (0.00 sec)
+
+mysql> DROP TABLE Depositor;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DROP TABLE borrower;
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> DROP TABLE customer;
+Query OK, 0 rows affected (0.01 sec)
